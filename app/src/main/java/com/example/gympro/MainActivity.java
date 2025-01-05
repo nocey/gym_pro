@@ -12,7 +12,7 @@ public class MainActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private EditText emailEditText, passwordEditText;
-    private Button loginButton, registerButton;
+    private Button loginButton, registerButton, resetPasswordButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +25,8 @@ public class MainActivity extends AppCompatActivity {
         passwordEditText = findViewById(R.id.passwordEditText);
         loginButton = findViewById(R.id.loginButton);
         registerButton = findViewById(R.id.registerButton);
-
+        resetPasswordButton = findViewById(R.id.forgatPassword);
+        resetPasswordButton.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, ResetPasswordActivity.class)));
         loginButton.setOnClickListener(v -> loginUser());
         registerButton.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, RegisterActivity.class)));
     }
