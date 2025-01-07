@@ -11,8 +11,6 @@ import com.google.firebase.auth.FirebaseUser;
 public class DashboardActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
-    private TextView welcomeTextView;
-    private Button logoutButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,8 +20,9 @@ public class DashboardActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser user = mAuth.getCurrentUser();
 
-        welcomeTextView = findViewById(R.id.welcomeTextView);
-        logoutButton = findViewById(R.id.logoutButton);
+        TextView welcomeTextView = findViewById(R.id.welcomeTextView);
+        Button logoutButton = findViewById(R.id.logoutButton);
+        Button createProgramButton = findViewById(R.id.createProgramButton);
 
         if (user != null) {
             welcomeTextView.setText("Welcome, " + user.getEmail());
@@ -33,6 +32,12 @@ public class DashboardActivity extends AppCompatActivity {
             mAuth.signOut();
             startActivity(new Intent(DashboardActivity.this, MainActivity.class));
             finish();
+        });
+
+        // Navigate to the new RecyclerView activity
+        createProgramButton.setOnClickListener(v -> {
+            Intent intent = new Intent(DashboardActivity.this, ProgramActivity.class);
+            startActivity(intent);
         });
     }
 }
