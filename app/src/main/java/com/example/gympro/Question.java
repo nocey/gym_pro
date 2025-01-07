@@ -1,13 +1,11 @@
 package com.example.gympro;
 
-import java.util.List;
-
 public class Question {
     private String questionText;
-    private List<String> answers;
+    private String[] answers;
     private String selectedAnswer;
 
-    public Question(String questionText, List<String> answers) {
+    public Question(String questionText, String[] answers) {
         this.questionText = questionText;
         this.answers = answers;
     }
@@ -16,15 +14,15 @@ public class Question {
         return questionText;
     }
 
-    public List<String> getAnswers() {
+    public String[] getAnswers() {
         return answers;
-    }
-
-    public void setSelectedAnswer(String answer) {
-        this.selectedAnswer = answer;
     }
 
     public String getSelectedAnswer() {
         return selectedAnswer;
+    }
+
+    public void setSelectedAnswer(String selectedAnswer) {
+        this.selectedAnswer = selectedAnswer;
     }
 }

@@ -4,77 +4,83 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
-
+import com.google.firebase.firestore.CollectionReference;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class ProgramActivity extends AppCompatActivity {
-
     private RecyclerView recyclerView;
     private ProgramAdapter adapter;
-    private List<Question> questionList;
-    private Button saveAnswersButton;
-    private FirebaseFirestore db;
+    private ArrayList<Question> questionsList;
+    private Button saveButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_program);
 
-        // Initialize Firestore
-        db = FirebaseFirestore.getInstance();
-
-        // Set up RecyclerView
         recyclerView = findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        saveButton = findViewById(R.id.saveButton);
 
-        // Initialize question list
-        questionList = new ArrayList<>();
+        questionsList = new ArrayList<>();
         loadQuestions();
 
-        // Initialize and set the adapter
-        adapter = new ProgramAdapter(questionList);
+        adapter = new ProgramAdapter(this, questionsList);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
-        // Set up Save Answers button
-        saveAnswersButton = findViewById(R.id.saveAnswersButton);
-        saveAnswersButton.setOnClickListener(v -> saveAnswersToFirestore());
+        saveButton.setOnClickListener(v -> saveAnswersToFirestore());
     }
 
     private void loadQuestions() {
-        // Load sample questions and answers
-        questionList.add(new Question("What is your fitness goal?", List.of(new String[]{"Build muscle", "Lose weight", "Improve endurance"})));
-        questionList.add(new Question("How many times do you work out per week?", List.of(new String[]{"1-2 times", "3-4 times", "5+ times"})));
-        questionList.add(new Question("What type of workout do you prefer?", List.of(new String[]{"Cardio", "Strength", "Flexibility"})));
-
+        // Here you can load the questions either from a local array or from Firestore
+        questionsList.add(new Question("What is your fitness goal?", new String[]{"Build Muscle", "Lose Fat", "Maintain Weight"}));
+        questionsList.add(new Question("How many days per week do you work out?", new String[]{"1-2", "3-4", "5+"}));
+        questionsList.add(new Question("What is your experience level?", new String[]{"Beginner", "Intermediate", "Advanced"}));
         // Add more questions as needed
     }
 
     private void saveAnswersToFirestore() {
-        // Loop through the questions and get selected answers
-        for (Question question : questionList) {
-            Map<String, Object> answerData = new HashMap<>();
-            answerData.put("questionText", question.getQuestionText());
-            answerData.put("selectedAnswer", question.getSelectedAnswer());
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            String userId = currentUser.getUid();
+            FirebaseFirestore firestore = FirebaseFirestore.getInstance();
 
-            // Save each question and selected answer to Firestore
-            db.collection("userAnswers")
-                    .add(answerData)
-                    .addOnSuccessListener(documentReference -> {
-                        Toast.makeText(ProgramActivity.this, "Answers saved successfully", Toast.LENGTH_SHORT).show();
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(ProgramActivity.this, "Error saving answers", Toast.LENGTH_SHORT).show();
-                    });
+            // Create a map for storing questions and answers
+            Map<String, Object> questionsData = new HashMap<>();
+
+            for (int i = 0; i < questionsList.size(); i++) {
+                String questionKey = "question" + (i + 1);
+                Question question = questionsList.get(i);
+
+                // Prepare data for each question
+                Map<String, Object> questionData = new HashMap<>();
+                questionData.put("answer", question.getSelectedAnswer());
+                questionData.put("id", i + 1);
+
+                // Add this question's data to the overall map
+                questionsData.put(questionKey, questionData);
+            }
+
+            // Save all questions under the user's document
+            firestore.collection("users")
+                    .document(userId)
+                    .collection("answers")
+                    .document("questions")
+                    .set(questionsData)
+                    .addOnSuccessListener(aVoid ->
+                            Toast.makeText(ProgramActivity.this, "Answers saved successfully!", Toast.LENGTH_SHORT).show())
+                    .addOnFailureListener(e ->
+                            Toast.makeText(ProgramActivity.this, "Failed to save answers: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+        } else {
+            Toast.makeText(this, "User not logged in.", Toast.LENGTH_SHORT).show();
         }
     }
 }
