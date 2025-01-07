@@ -1,45 +1,80 @@
 package com.example.gympro;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ProgramActivity extends AppCompatActivity {
 
-    private RecyclerView programRecyclerView;
-    private ProgramAdapter programAdapter;
+    private RecyclerView recyclerView;
+    private ProgramAdapter adapter;
+    private List<Question> questionList;
+    private Button saveAnswersButton;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_program);
 
-        programRecyclerView = findViewById(R.id.programRecyclerView);
-        programRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        // Initialize Firestore
+        db = FirebaseFirestore.getInstance();
 
-        // Generate sample questions with answers
-        ArrayList<Question> questions = generateQuestions();
+        // Set up RecyclerView
+        recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        programAdapter = new ProgramAdapter(questions);
-        programRecyclerView.setAdapter(programAdapter);
+        // Initialize question list
+        questionList = new ArrayList<>();
+        loadQuestions();
+
+        // Initialize and set the adapter
+        adapter = new ProgramAdapter(questionList);
+        recyclerView.setAdapter(adapter);
+
+        // Set up Save Answers button
+        saveAnswersButton = findViewById(R.id.saveAnswersButton);
+        saveAnswersButton.setOnClickListener(v -> saveAnswersToFirestore());
     }
 
-    // Generate sample gym-related questions with 3 answers each
-    private ArrayList<Question> generateQuestions() {
-        ArrayList<Question> questions = new ArrayList<>();
+    private void loadQuestions() {
+        // Load sample questions and answers
+        questionList.add(new Question("What is your fitness goal?", List.of(new String[]{"Build muscle", "Lose weight", "Improve endurance"})));
+        questionList.add(new Question("How many times do you work out per week?", List.of(new String[]{"1-2 times", "3-4 times", "5+ times"})));
+        questionList.add(new Question("What type of workout do you prefer?", List.of(new String[]{"Cardio", "Strength", "Flexibility"})));
 
-        questions.add(new Question("What is your primary goal?", new String[]{"Build muscle", "Lose weight", "Increase endurance"}));
-        questions.add(new Question("How many days per week can you commit?", new String[]{"1-2 days", "3-4 days", "5-7 days"}));
-        questions.add(new Question("What is your preferred workout time?", new String[]{"Morning", "Afternoon", "Evening"}));
-        questions.add(new Question("Do you prefer strength or cardio?", new String[]{"Strength", "Cardio", "Both"}));
-        questions.add(new Question("What is your fitness level?", new String[]{"Beginner", "Intermediate", "Advanced"}));
-        questions.add(new Question("Do you have any injuries?", new String[]{"Yes", "No", "Unsure"}));
-        questions.add(new Question("What equipment do you have access to?", new String[]{"Dumbbells", "Machines", "Bodyweight exercises"}));
-        questions.add(new Question("Do you want to include warm-up exercises?", new String[]{"Yes", "No", "Optional"}));
-        questions.add(new Question("Do you want a full-body or split routine?", new String[]{"Full-body", "Split routine", "Either"}));
+        // Add more questions as needed
+    }
 
-        return questions;
+    private void saveAnswersToFirestore() {
+        // Loop through the questions and get selected answers
+        for (Question question : questionList) {
+            Map<String, Object> answerData = new HashMap<>();
+            answerData.put("questionText", question.getQuestionText());
+            answerData.put("selectedAnswer", question.getSelectedAnswer());
+
+            // Save each question and selected answer to Firestore
+            db.collection("userAnswers")
+                    .add(answerData)
+                    .addOnSuccessListener(documentReference -> {
+                        Toast.makeText(ProgramActivity.this, "Answers saved successfully", Toast.LENGTH_SHORT).show();
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(ProgramActivity.this, "Error saving answers", Toast.LENGTH_SHORT).show();
+                    });
+        }
     }
 }

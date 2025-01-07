@@ -1,22 +1,30 @@
 package com.example.gympro;
 
+import java.util.List;
+
 public class Question {
     private String questionText;
-    private String[] answers; // Array of 3 answers
+    private List<String> answers;
+    private String selectedAnswer;
 
-    // Constructor to initialize the question and answers
-    public Question(String questionText, String[] answers) {
+    public Question(String questionText, List<String> answers) {
         this.questionText = questionText;
         this.answers = answers;
     }
 
-    // Getter for the question text
     public String getQuestionText() {
         return questionText;
     }
 
-    // Getter for the answers
-    public String[] getAnswers() {
+    public List<String> getAnswers() {
         return answers;
+    }
+
+    public void setSelectedAnswer(String answer) {
+        this.selectedAnswer = answer;
+    }
+
+    public String getSelectedAnswer() {
+        return selectedAnswer;
     }
 }

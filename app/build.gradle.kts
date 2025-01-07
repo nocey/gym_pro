@@ -31,7 +31,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
     buildFeatures {
-        viewBinding = true
+        viewBinding = false
     }
 }
 
@@ -45,11 +45,15 @@ dependencies {
 
     // Also add the dependency for the Google Play services library and specify its version
     implementation("com.google.android.gms:play-services-auth:21.3.0")
+    implementation ("com.google.firebase:firebase-database:20.0.5")
+    implementation ("com.google.firebase:firebase-firestore:24.0.0")
+    implementation ("com.google.firebase:firebase-auth:21.0.5")
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.constraintlayout)
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
+    implementation(libs.recyclerview)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
