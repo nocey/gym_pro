@@ -10,10 +10,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
-
+import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -151,6 +152,9 @@ public class ProgramActivity extends AppCompatActivity {
             summaryData.put("totalDays", totalDays);
 
             // Save the user's answers and summary data in Firestore
+            int finalTotalStrength = totalStrength;
+            int finalTotalDays = totalDays;
+            int finalTotalCardio = totalCardio;
             firestore.collection("users")
                     .document(userId)
                     .collection("answers")
@@ -164,6 +168,8 @@ public class ProgramActivity extends AppCompatActivity {
                                 .document("summary")
                                 .set(summaryData)
                                 .addOnSuccessListener(aVoid1 -> {
+                                    // Copy the appropriate program (cardio, mixed, or strength)
+                                    copyProgramToUser(userId, finalTotalStrength, finalTotalCardio, finalTotalDays);
                                     Toast.makeText(ProgramActivity.this, "Answers saved successfully!", Toast.LENGTH_SHORT).show();
                                     goBackToDashboard();
                                 })
@@ -178,6 +184,61 @@ public class ProgramActivity extends AppCompatActivity {
             Toast.makeText(this, "User not logged in.", Toast.LENGTH_SHORT).show();
         }
     }
+
+    private void copyProgramToUser(String userId, int totalStrength, int totalCardio, int totalDays) {
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+        CollectionReference programsRef = firestore.collection("Programs");
+
+        // Determine which program to copy based on totalStrength, totalCardio, and totalDays
+        String programType;
+        if (totalCardio > totalStrength) {
+            programType = "cardio";
+        } else if (totalStrength > totalCardio) {
+            programType = "str";
+        } else {
+            programType = "mixed";
+        }
+
+        DocumentReference programDocRef = programsRef.document(programType);
+        programDocRef.get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                // Delete any existing programs in the user's 'programs' collection
+                firestore.collection("users")
+                        .document(userId)
+                        .collection("programs")
+                        .get()
+                        .addOnSuccessListener(querySnapshot -> {
+                            // Delete all programs in the user's programs subcollection
+                            for (DocumentSnapshot document : querySnapshot) {
+                                document.getReference().delete();
+                            }
+
+                            // Now that all previous programs are deleted, add the new program
+                            Map<String, Object> programData = documentSnapshot.getData();
+                            firestore.collection("users")
+                                    .document(userId)
+                                    .collection("programs")
+                                    .document(programType)
+                                    .set(programData)
+                                    .addOnSuccessListener(aVoid -> {
+                                        Toast.makeText(ProgramActivity.this, programType + " program copied successfully!", Toast.LENGTH_SHORT).show();
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Toast.makeText(ProgramActivity.this, "Failed to copy program: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    });
+                        })
+                        .addOnFailureListener(e -> {
+                            Toast.makeText(ProgramActivity.this, "Failed to fetch user's programs: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        });
+
+            } else {
+                Toast.makeText(ProgramActivity.this, "Program data not found.", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(e -> {
+            Toast.makeText(ProgramActivity.this, "Failed to fetch program data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        });
+    }
+
 
     private void goBackToDashboard() {
         // Go back to the Dashboard activity after saving the data
