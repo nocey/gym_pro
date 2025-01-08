@@ -1,27 +1,54 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
     <TextView
         android:id="@+id/welcomeTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="Welcome, User"
         android:textSize="18sp"
-        android:textStyle="bold" />
+        android:layout_marginTop="20dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"/>
 
     <Button
         android:id="@+id/logoutButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Logout" />
+        android:text="Logout"
+        android:layout_below="@id/welcomeTextView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"/>
 
     <Button
         android:id="@+id/createProgramButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Create a Program"
-        android:layout_marginTop="16dp" />
-</LinearLayout>
+        android:text="Create Workout Program"
+        android:layout_below="@id/logoutButton"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"/>
+
+    <!-- RecyclerView for displaying the week days in a vertical list -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/weekRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/createProgramButton"
+        android:layout_marginTop="30dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"/>
+
+    <TextView
+        android:id="@+id/programPreviewTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Program Preview"
+        android:textSize="16sp"
+        android:layout_below="@id/weekRecyclerView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"/>
+
+</RelativeLayout>

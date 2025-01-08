@@ -28,6 +28,10 @@
             android:exported="true">
         </activity>
         <activity
+            android:name=".WeeklyCalendarActivity"
+            android:exported="true">
+        </activity>
+        <activity
             android:name=".ProgramActivity"
             android:exported="true">
         </activity>
