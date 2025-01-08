@@ -2,27 +2,27 @@ package com.example.gympro;
 
 public class Question {
     private String questionText;
-    private String[] answers;
-    private String selectedAnswer;
+    private Answer[] answers;  // Change from single Answer to an array of Answer
+    private Answer selectedAnswer;
 
-    public Question(String questionText, String[] answers) {
+    public Question(String questionText, Answer[] answers) {
         this.questionText = questionText;
-        this.answers = answers;
+        this.answers = answers;  // Initialize answers
     }
 
     public String getQuestionText() {
         return questionText;
     }
 
-    public String[] getAnswers() {
+    public Answer[] getAnswers() {  // Add this method to return all answers for the question
         return answers;
     }
 
-    public String getSelectedAnswer() {
+    public Answer getSelectedAnswer() {
         return selectedAnswer;
     }
 
-    public void setSelectedAnswer(String selectedAnswer) {
+    public void setSelectedAnswer(Answer selectedAnswer) {
         this.selectedAnswer = selectedAnswer;
     }
 }
