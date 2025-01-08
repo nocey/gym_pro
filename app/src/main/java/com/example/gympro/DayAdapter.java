@@ -12,47 +12,47 @@ import java.util.List;
 
 public class DayAdapter extends RecyclerView.Adapter<DayAdapter.DayViewHolder> {
 
-    private List<String> daysOfWeek;
+    private List<String> days;
     private Context context;
+    private OnDayClickListener onDayClickListener;
 
-    public DayAdapter(List<String> daysOfWeek, Context context) {
-        this.daysOfWeek = daysOfWeek;
+    public DayAdapter(List<String> days, Context context, OnDayClickListener onDayClickListener) {
+        this.days = days;
         this.context = context;
+        this.onDayClickListener = onDayClickListener;
     }
 
     @Override
     public DayViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        // Inflate the layout for the individual day item
         View view = LayoutInflater.from(context).inflate(R.layout.item_day, parent, false);
         return new DayViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(DayViewHolder holder, int position) {
-        String day = daysOfWeek.get(position);
+        String day = days.get(position);
         holder.dayTextView.setText(day);
 
-        // Set an onClickListener to fetch the program when a day is clicked
-        holder.itemView.setOnClickListener(v -> {
-            // Make sure the context is an instance of DashboardActivity
-            if (context instanceof DashboardActivity) {
-                ((DashboardActivity) context).fetchProgramForDay(day);
-            }
-        });
+        // Set the click listener to pass the selected day to the listener
+        holder.itemView.setOnClickListener(v -> onDayClickListener.onDayClick(day));
     }
 
     @Override
     public int getItemCount() {
-        return daysOfWeek.size();
+        return days.size();
+    }
+
+    public interface OnDayClickListener {
+        void onDayClick(String day);
     }
 
     public class DayViewHolder extends RecyclerView.ViewHolder {
+
         TextView dayTextView;
 
         public DayViewHolder(View itemView) {
             super(itemView);
-            // Find the TextView that will display the day
-            dayTextView = itemView.findViewById(R.id.dayTextView); // Ensure this ID exists in your item_day layout
+            dayTextView = itemView.findViewById(R.id.dayTextView);
         }
     }
 }

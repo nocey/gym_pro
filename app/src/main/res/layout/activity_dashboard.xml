@@ -1,54 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
 
+    <!-- RecyclerView for displaying days of the week horizontally at the top of the screen -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/dayRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:layout_gravity="left"
+        android:layout_marginBottom="20dp"
+        android:orientation="horizontal"
+        android:scrollbars="horizontal" />
+
+    <!-- Program Preview TextView (displayed below the days) -->
     <TextView
-        android:id="@+id/welcomeTextView"
-        android:layout_width="wrap_content"
+        android:id="@+id/programPreviewTextView"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Welcome, User"
-        android:textSize="18sp"
-        android:layout_marginTop="20dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"/>
+        android:text="Program Preview"
+        android:textSize="16sp"
+        android:gravity="center"/>
 
+    <!-- Logout and Create Program Buttons -->
     <Button
         android:id="@+id/logoutButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Logout"
-        android:layout_below="@id/welcomeTextView"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="30dp"/>
+        android:layout_marginTop="20dp"/>
 
     <Button
         android:id="@+id/createProgramButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Create Workout Program"
-        android:layout_below="@id/logoutButton"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="30dp"/>
-
-    <!-- RecyclerView for displaying the week days in a vertical list -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/weekRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/createProgramButton"
-        android:layout_marginTop="30dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"/>
-
-    <TextView
-        android:id="@+id/programPreviewTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Program Preview"
-        android:textSize="16sp"
-        android:layout_below="@id/weekRecyclerView"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="50dp"/>
-
-</RelativeLayout>
+        android:text="Create Program"
+        android:layout_marginTop="10dp"/>
+</LinearLayout>
