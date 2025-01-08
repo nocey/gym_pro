@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,47 +45,47 @@ public class ProgramActivity extends AppCompatActivity {
 
     private void loadQuestions() {
         // Add your 9 questions here
-        questionsList.add(new Question("How often do you engage in physical exercise?", new Answer[] {
+        questionsList.add(new Question("How often do you engage in physical exercise?", new Answer[]{
                 new Answer("Rarely", -1, -1, 0),
                 new Answer("Occasionally (1-2 times per week)", 0, 0, 0),
                 new Answer("Regularly (3 or more times per week)", 1, 1, 0)
         }));
-        questionsList.add(new Question("What is your primary fitness goal?", new Answer[] {
+        questionsList.add(new Question("What is your primary fitness goal?", new Answer[]{
                 new Answer("Weight loss", -1, 2, 0),
                 new Answer("Muscle building", 2, -1, 0),
                 new Answer("Overall fitness & health", 1, 1, 0)
         }));
-        questionsList.add(new Question("How would you rate your current fitness level?", new Answer[] {
+        questionsList.add(new Question("How would you rate your current fitness level?", new Answer[]{
                 new Answer("Beginner", -1, -1, 0),
                 new Answer("Intermediate", 0, 0, 0),
                 new Answer("Advanced", 1, 1, 0)
         }));
-        questionsList.add(new Question("What type of exercise do you prefer?", new Answer[] {
+        questionsList.add(new Question("What type of exercise do you prefer?", new Answer[]{
                 new Answer("Cardio", -1, 2, 0),
                 new Answer("Strength training", 2, -1, 0),
                 new Answer("A mix of cardio and strength", 1, 1, 0)
         }));
-        questionsList.add(new Question("How many days per week can you commit to working out?", new Answer[] {
+        questionsList.add(new Question("How many days per week can you commit to working out?", new Answer[]{
                 new Answer("3 days", 1, 1, 3),
                 new Answer("4 days", 2, 2, 4),
                 new Answer("5 days", 3, 3, 5)
         }));
-        questionsList.add(new Question("What best describes your workout style?", new Answer[] {
+        questionsList.add(new Question("What best describes your workout style?", new Answer[]{
                 new Answer("Quick and intense", 2, 0, 0),
                 new Answer("Moderate and steady", 1, 1, 0),
                 new Answer("Relaxed and low intensity", 0, 2, 0)
         }));
-        questionsList.add(new Question("How much time do you have for each workout session?", new Answer[] {
+        questionsList.add(new Question("How much time do you have for each workout session?", new Answer[]{
                 new Answer("20-30 minutes", 0, 1, 0),
                 new Answer("30-45 minutes", 1, 1, 0),
                 new Answer("45+ minutes", 2, 2, 0)
         }));
-        questionsList.add(new Question("How important is variety in your workout routine?", new Answer[] {
+        questionsList.add(new Question("How important is variety in your workout routine?", new Answer[]{
                 new Answer("Not very important", 1, 0, 0),
                 new Answer("Somewhat important", 0, 1, 0),
                 new Answer("Very important", 1, 1, 0)
         }));
-        questionsList.add(new Question("What helps you stay consistent with workouts?", new Answer[] {
+        questionsList.add(new Question("What helps you stay consistent with workouts?", new Answer[]{
                 new Answer("Having a set routine to follow", 2, 0, 0),
                 new Answer("Tracking results and progress", 1, 1, 0),
                 new Answer("Adding variety and trying new things", 1, 2, 0)
@@ -136,6 +135,8 @@ public class ProgramActivity extends AppCompatActivity {
             summaryData.put("totalDays", totalDays);
 
             int finalTotalDays = totalDays;
+            int finalTotalStrength = totalStrength;
+            int finalTotalCardio = totalCardio;
             firestore.collection("users")
                     .document(userId)
                     .collection("answers")
@@ -148,8 +149,8 @@ public class ProgramActivity extends AppCompatActivity {
                                 .document("summary")
                                 .set(summaryData)
                                 .addOnSuccessListener(aVoid1 -> {
-                                    // Now copy program data before navigating to the dashboard
-                                    copyProgramDataAndNavigate(userId, finalTotalDays);
+                                    // Call to copy the program after answers are saved
+                                    copyProgramDataAndNavigate(userId, finalTotalStrength, finalTotalCardio, finalTotalDays);
                                 })
                                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to save summary: " + e.getMessage(), Toast.LENGTH_SHORT).show());
                     })
@@ -159,23 +160,34 @@ public class ProgramActivity extends AppCompatActivity {
         }
     }
 
-    private void copyProgramDataAndNavigate(String userId, int totalDays) {
+    private void copyProgramDataAndNavigate(String userId, int totalStrength, int totalCardio, int totalDays) {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
 
-        // Fetch program data from the "programs" collection
+        // Determine program type based on totalStrength and totalCardio
+        String programType; // Default program if the scores are balanced
+
+        if (totalStrength > totalCardio) {
+            programType = "str"; // Strength program
+        } else if (totalCardio > totalStrength) {
+            programType = "cardio"; // Cardio program
+        } else {
+            programType = "mixed";
+        }
+
+        // Fetch program data from the appropriate program collection
         firestore.collection("Programs")
-                .document("str")  // Replace with the actual program document id or logic to fetch the program
+                .document(programType)  // Use dynamic program name based on the user's preference
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
-                        // Assuming the "strengthTraining" document contains the program data
+                        // Assuming the document contains program data
                         Map<String, Object> programData = documentSnapshot.getData();
 
-                        // Save the program data to the user's collection (under "programs")
+                        // Save the program data to the user's collection (under the chosen program type)
                         firestore.collection("users")
                                 .document(userId)
-                                .collection("programs")
-                                .document("str")  // Save under an appropriate name
+                                .collection("Programs")
+                                .document(programType)  // Save under the dynamic program name
                                 .set(programData)
                                 .addOnSuccessListener(aVoid -> {
                                     // After copying program data, show the days selection dialog
@@ -183,7 +195,7 @@ public class ProgramActivity extends AppCompatActivity {
                                 })
                                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to copy program data: " + e.getMessage(), Toast.LENGTH_SHORT).show());
                     } else {
-                        Toast.makeText(this, "No program data found.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "No program data found for " + programType, Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to fetch program data: " + e.getMessage(), Toast.LENGTH_SHORT).show());

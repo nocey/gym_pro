@@ -81,7 +81,7 @@ public class DashboardActivity extends AppCompatActivity {
 
                             db.collection("users")
                                     .document(user.getUid())
-                                    .collection("programs")
+                                    .collection("Programs")
                                     .document("str")
                                     .get()
                                     .addOnSuccessListener(programDocument -> {
