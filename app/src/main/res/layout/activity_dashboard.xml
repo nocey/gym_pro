@@ -38,4 +38,16 @@
         android:layout_height="wrap_content"
         android:text="Create Program"
         android:layout_marginTop="10dp"/>
+    <WebView
+        android:id="@+id/youtubeWebView"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:layout_marginTop="20dp"
+        android:visibility="gone" />
+    <LinearLayout
+        android:id="@+id/programLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="20dp" />
 </LinearLayout>

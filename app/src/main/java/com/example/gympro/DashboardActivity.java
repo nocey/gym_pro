@@ -3,7 +3,10 @@ package com.example.gympro;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.webkit.WebView;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -95,13 +98,32 @@ public class DashboardActivity extends AppCompatActivity {
                                                     List<Map<String, String>> exercises = (List<Map<String, String>>) dayProgram.get("workouts");
 
                                                     if (exercises != null && !exercises.isEmpty()) {
-                                                        StringBuilder programDetails = new StringBuilder("Workout for " + day + ":\n");
+                                                        // Clear previous buttons or data
+                                                        LinearLayout programLayout = findViewById(R.id.programLayout);
+                                                        programLayout.removeAllViews();
+
+                                                        // Initialize the WebView (hidden by default)
+                                                        WebView youtubeWebView = findViewById(R.id.youtubeWebView);
+                                                        youtubeWebView.setVisibility(View.GONE);  // Hide it initially
+
                                                         for (Map<String, String> exercise : exercises) {
                                                             String name = exercise.get("name");
                                                             String sets = exercise.get("sets");
-                                                            programDetails.append("- ").append(name).append(" (").append(sets).append(" sets)\n");
+                                                            String link = exercise.get("link");  // Get the link
+
+                                                            // Create a TextView for the name and sets
+                                                            TextView exerciseText = new TextView(DashboardActivity.this);
+                                                            exerciseText.setText(name + " (" + sets + " sets)");
+                                                            programLayout.addView(exerciseText);
+
+                                                            // Create a Button for the link (YouTube)
+                                                            Button videoButton = new Button(DashboardActivity.this);
+                                                            videoButton.setText("Watch video");
+                                                            videoButton.setOnClickListener(v -> {
+                                                                showYouTubeVideo(link, youtubeWebView);
+                                                            });
+                                                            programLayout.addView(videoButton);
                                                         }
-                                                        programPreviewTextView.setText(programDetails.toString());
                                                     } else {
                                                         programPreviewTextView.setText("Rest day");
                                                     }
@@ -129,6 +151,19 @@ public class DashboardActivity extends AppCompatActivity {
                     });
         }
     }
+
+    // This method loads the YouTube video in the WebView
+    public void showYouTubeVideo(String link, WebView youtubeWebView) {
+        // Extract the video ID from the link and construct the embed URL
+        String videoId = link.substring(link.indexOf("v=") + 2, link.indexOf("v=") + 13);
+        String embedUrl = "https://www.youtube.com/embed/" + videoId;
+
+        // Show the WebView and load the video
+        youtubeWebView.setVisibility(View.VISIBLE);
+        youtubeWebView.getSettings().setJavaScriptEnabled(true);
+        youtubeWebView.loadUrl(embedUrl);
+    }
+
 
     // Helper method to determine which field to fetch from the 'str' document based on totalDays
     private String getProgramField(int totalDays) {
