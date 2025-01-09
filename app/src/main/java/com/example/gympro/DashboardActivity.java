@@ -3,13 +3,16 @@ package com.example.gympro;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -27,8 +30,6 @@ public class DashboardActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private RecyclerView dayRecyclerView;
     private TextView programPreviewTextView;
-    private Button logoutButton;
-    private Button createProgramButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,35 +40,48 @@ public class DashboardActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
-        // Get the current user
-        FirebaseUser user = mAuth.getCurrentUser();
+        // Set up the Toolbar
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         // Find views
-        programPreviewTextView = findViewById(R.id.programPreviewTextView);
-        logoutButton = findViewById(R.id.logoutButton);
-        createProgramButton = findViewById(R.id.createProgramButton);
         dayRecyclerView = findViewById(R.id.dayRecyclerView);
 
         // Set up RecyclerView for the days of the week using DayAdapter
         dayRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         DayAdapter adapter = new DayAdapter(Arrays.asList("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"), this, this::fetchProgramForDay);
         dayRecyclerView.setAdapter(adapter);
+    }
 
-        // Logout button logic
-        logoutButton.setOnClickListener(v -> {
+    // Inflate the menu
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.dashboard_menu, menu);
+        return true;
+    }
+
+    // Handle menu item clicks
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.menu_logout) {
+            // Logout logic
             mAuth.signOut();
             startActivity(new Intent(DashboardActivity.this, MainActivity.class));
             finish();
-        });
-
-        // Navigate to the new RecyclerView activity (for program creation)
-        createProgramButton.setOnClickListener(v -> {
+            return true;
+        } else if (id == R.id.menu_create_program) {
+            // Navigate to ProgramActivity
             Intent intent = new Intent(DashboardActivity.this, ProgramActivity.class);
             startActivity(intent);
-        });
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
-    // This method fetches the program for the selected day
+    // Fetch program for the selected day (restored to the original logic)
     public void fetchProgramForDay(String day) {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
@@ -91,57 +105,111 @@ public class DashboardActivity extends AppCompatActivity {
                                         if (programDocument.exists()) {
                                             List<Map<String, Object>> selectedProgram = (List<Map<String, Object>>) programDocument.get(programField);
 
+                                            LinearLayout programLayout = findViewById(R.id.programLayout);
+                                            programLayout.removeAllViews();  // Clear any previous content
+
                                             if (chosenDays != null && chosenDays.contains(day)) {
                                                 int dayIndex = chosenDays.indexOf(day);
                                                 if (dayIndex != -1 && selectedProgram != null && dayIndex < selectedProgram.size()) {
                                                     Map<String, Object> dayProgram = selectedProgram.get(dayIndex);
                                                     List<Map<String, String>> exercises = (List<Map<String, String>>) dayProgram.get("workouts");
 
+                                                    // Clear WebView (not used here)
+                                                    WebView youtubeWebView = findViewById(R.id.youtubeWebView);
+                                                    youtubeWebView.setVisibility(View.GONE);
+
                                                     if (exercises != null && !exercises.isEmpty()) {
-                                                        // Clear previous buttons or data
-                                                        LinearLayout programLayout = findViewById(R.id.programLayout);
-                                                        programLayout.removeAllViews();
-
-                                                        // Initialize the WebView (hidden by default)
-                                                        WebView youtubeWebView = findViewById(R.id.youtubeWebView);
-                                                        youtubeWebView.setVisibility(View.GONE);  // Hide it initially
-
+                                                        // Show workout program
                                                         for (Map<String, String> exercise : exercises) {
                                                             String name = exercise.get("name");
                                                             String sets = exercise.get("sets");
-                                                            String link = exercise.get("link");  // Get the link
+                                                            String link = exercise.get("link");
 
-                                                            // Create a TextView for the name and sets
+                                                            // Create a TextView for each exercise name and sets
                                                             TextView exerciseText = new TextView(DashboardActivity.this);
                                                             exerciseText.setText(name + " (" + sets + " sets)");
+
+                                                            // Set background and text color
+                                                            exerciseText.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                                                            exerciseText.setTextColor(getResources().getColor(R.color.colorSecondary));
+
+                                                            // Center the text
+                                                            exerciseText.setGravity(Gravity.CENTER);
+
+                                                            // Increase the text size and make them a bit bigger
+                                                            exerciseText.setTextSize(20); // Adjust size as needed
+
+                                                            // Add margin to center better vertically
+                                                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                                                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                                                            params.setMargins(0, 20, 0, 20); // Margin top and bottom to separate from other elements
+                                                            exerciseText.setLayoutParams(params);
+
                                                             programLayout.addView(exerciseText);
 
-                                                            // Create a Button for the link (YouTube)
-                                                            Button videoButton = new Button(DashboardActivity.this);
-                                                            videoButton.setText("Watch video");
-                                                            videoButton.setOnClickListener(v -> {
-                                                                // Open the video in a new activity
-                                                                Intent intent = new Intent(DashboardActivity.this, VideoActivity.class);
-                                                                intent.putExtra("VIDEO_URL", link);  // Pass the video URL
-                                                                startActivity(intent);
-                                                            });
-                                                            programLayout.addView(videoButton);
+                                                            // If the exercise has a link, add a button to watch the video
+                                                            if (link != null && !link.isEmpty()) {
+                                                                TextView watchVideoButton = new TextView(DashboardActivity.this);
+                                                                watchVideoButton.setText("Watch Video");
+
+                                                                // Set background and text color for the watch button
+                                                                watchVideoButton.setBackgroundColor(getResources().getColor(R.color.colorSecondary)); // Secondary color for background
+                                                                watchVideoButton.setTextColor(getResources().getColor(R.color.colorPrimary)); // Primary color for text
+
+                                                                // Center the text for the watch button
+                                                                watchVideoButton.setGravity(Gravity.CENTER);
+
+                                                                // Increase the text size for the "Watch Video" button (make it bigger than the other text)
+                                                                watchVideoButton.setTextSize(24); // Adjust size to make it bigger than exercise text
+
+                                                                // Add padding for spacing
+                                                                watchVideoButton.setPadding(0, 10, 0, 10);
+
+                                                                // Set the click listener to open the video
+                                                                watchVideoButton.setOnClickListener(v -> {
+                                                                    // Open the video in a new activity
+                                                                    Intent intent = new Intent(DashboardActivity.this, VideoActivity.class);
+                                                                    intent.putExtra("VIDEO_URL", link);  // Pass the video URL
+                                                                    startActivity(intent);
+                                                                });
+
+                                                                // Add the "Watch Video" button below the exercise text
+                                                                programLayout.addView(watchVideoButton);
+                                                            }
                                                         }
-                                                    } else {
-                                                        programPreviewTextView.setText("Rest day");
                                                     }
+
                                                 } else {
-                                                    programPreviewTextView.setText("Rest day");
+                                                    // Show "Rest day" message
+                                                    TextView restDayText = new TextView(DashboardActivity.this);
+                                                    // Set background color to colorPrimary and text color to colorSecondary
+                                                    restDayText.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                                                    restDayText.setTextColor(getResources().getColor(R.color.colorSecondary));
+
+                                                    restDayText.setGravity(Gravity.CENTER);
+
+                                                    restDayText.setTextSize(20); // You can adjust the value to make it as big as needed
+                                                    restDayText.setText("Rest day");
+                                                    programLayout.addView(restDayText);
                                                 }
                                             } else {
-                                                programPreviewTextView.setText("Rest day");
+                                                // Day not chosen, show "Rest day" message
+                                                TextView restDayText = new TextView(DashboardActivity.this);
+                                                // Set background color to colorPrimary and text color to colorSecondary
+                                                restDayText.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                                                restDayText.setTextColor(getResources().getColor(R.color.colorSecondary));
+
+                                                restDayText.setGravity(Gravity.CENTER);
+
+                                                restDayText.setTextSize(20); // You can adjust the value to make it as big as needed
+                                                restDayText.setText("Rest day");
+                                                programLayout.addView(restDayText);
                                             }
                                         } else {
                                             Log.d("ProgramFetch", "No program data found!");
                                         }
                                     })
                                     .addOnFailureListener(e -> {
-                                        programPreviewTextView.setText("Error fetching program.");
                                         Log.e("ProgramFetch", "Error fetching program document: ", e);
                                     });
                         } else {
@@ -149,26 +217,15 @@ public class DashboardActivity extends AppCompatActivity {
                         }
                     })
                     .addOnFailureListener(e -> {
-                        programPreviewTextView.setText("Error fetching summary.");
                         Log.e("ProgramFetch", "Error fetching summary document: ", e);
                     });
         }
     }
 
-    // This method loads the YouTube video in the WebView
-    public void showYouTubeVideo(String link, WebView youtubeWebView) {
-        // Extract the video ID from the link and construct the embed URL
-        String videoId = link.substring(link.indexOf("v=") + 2, link.indexOf("v=") + 13);
-        String embedUrl = "https://www.youtube.com/embed/" + videoId;
-
-        // Show the WebView and load the video
-        youtubeWebView.setVisibility(View.VISIBLE);
-        youtubeWebView.getSettings().setJavaScriptEnabled(true);
-        youtubeWebView.loadUrl(embedUrl);
-    }
 
 
-    // Helper method to determine which field to fetch from the 'str' document based on totalDays
+
+
     private String getProgramField(int totalDays) {
         switch (totalDays) {
             case 3:
@@ -182,3 +239,4 @@ public class DashboardActivity extends AppCompatActivity {
         }
     }
 }
+

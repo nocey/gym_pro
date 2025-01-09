@@ -1,5 +1,7 @@
 package com.example.gympro;
 
+import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.webkit.WebView;
 import androidx.appcompat.app.AppCompatActivity;
@@ -8,6 +10,7 @@ public class VideoActivity extends AppCompatActivity {
 
     private WebView youtubeWebView;
 
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,6 +34,9 @@ public class VideoActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        finish();  // Close this activity and return to DashboardActivity
+        Intent intent = new Intent(VideoActivity.this, DashboardActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);  // Avoid restarting DashboardActivity
+        startActivity(intent);
+        finish();  // Close VideoActivity
     }
 }

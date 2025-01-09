@@ -1,11 +1,19 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:background="@color/colorPrimary">
 
-    <!-- RecyclerView for displaying days of the week horizontally at the top of the screen -->
+    <!-- Toolbar for the settings menu -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar" />
+
+    <!-- Rest of the layout (RecyclerView, etc.) -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/dayRecyclerView"
         android:layout_width="match_parent"
@@ -13,41 +21,25 @@
         android:layout_gravity="left"
         android:layout_marginBottom="20dp"
         android:orientation="horizontal"
-        android:scrollbars="horizontal" />
+        android:scrollbars="horizontal"
+        android:background="@color/colorSecondary" />
 
-    <!-- Program Preview TextView (displayed below the days) -->
-    <TextView
-        android:id="@+id/programPreviewTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Program Preview"
-        android:textSize="16sp"
-        android:gravity="center"/>
+    <!-- Other layout content -->
 
-    <!-- Logout and Create Program Buttons -->
-    <Button
-        android:id="@+id/logoutButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Logout"
-        android:layout_marginTop="20dp"/>
+    <LinearLayout
+    android:id="@+id/programLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginTop="20dp"
+    android:background="@color/colorSecondary" /> <!-- Applying secondary color to program layout -->
 
-    <Button
-        android:id="@+id/createProgramButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Create Program"
-        android:layout_marginTop="10dp"/>
+    <!-- WebView for YouTube videos -->
     <WebView
         android:id="@+id/youtubeWebView"
         android:layout_width="match_parent"
         android:layout_height="250dp"
         android:layout_marginTop="20dp"
         android:visibility="gone" />
-    <LinearLayout
-        android:id="@+id/programLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="20dp" />
+
 </LinearLayout>

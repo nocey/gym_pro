@@ -4,31 +4,46 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="@color/colorPrimary"
+    android:gravity="center"> <!-- Centers the contents vertically and horizontally -->
 
     <EditText
         android:id="@+id/registerEmailEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Email"
-        android:inputType="textEmailAddress" />
+        android:inputType="textEmailAddress"
+        android:padding="10dp"
+        android:textColorHint="@android:color/darker_gray"
+        android:background="@color/colorSecondary"
+        android:layout_marginBottom="16dp" /> <!-- Margin for spacing between fields -->
 
     <EditText
         android:id="@+id/registerPasswordEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/colorSecondary"
         android:hint="Password"
-        android:inputType="textPassword" />
+        android:inputType="textPassword"
+        android:padding="10dp"
+        android:textColorHint="@android:color/darker_gray"
+        android:layout_marginBottom="16dp" /> <!-- Margin for spacing between fields -->
 
     <Button
         android:id="@+id/registerUserButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Register" />
+        android:text="Register"
+        android:textColor="@color/colorPrimary"
+        android:backgroundTint="@color/colorSecondary"
+        android:layout_marginBottom="16dp" /> <!-- Margin for spacing between buttons -->
+
     <Button
         android:id="@+id/loginButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Go Back to Login" />
-
+        android:backgroundTint="@color/colorPrimary"
+        android:text="Back to log in"
+        android:textColor="@color/colorSecondary" />
 </LinearLayout>
