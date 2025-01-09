@@ -120,7 +120,10 @@ public class DashboardActivity extends AppCompatActivity {
                                                             Button videoButton = new Button(DashboardActivity.this);
                                                             videoButton.setText("Watch video");
                                                             videoButton.setOnClickListener(v -> {
-                                                                showYouTubeVideo(link, youtubeWebView);
+                                                                // Open the video in a new activity
+                                                                Intent intent = new Intent(DashboardActivity.this, VideoActivity.class);
+                                                                intent.putExtra("VIDEO_URL", link);  // Pass the video URL
+                                                                startActivity(intent);
                                                             });
                                                             programLayout.addView(videoButton);
                                                         }
