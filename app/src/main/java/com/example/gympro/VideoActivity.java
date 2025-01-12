@@ -16,13 +16,13 @@ public class VideoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video);
 
-        // Initialize the WebView
+        // Vebview i tanımla
         youtubeWebView = findViewById(R.id.youtubeWebView);
 
-        // Get the video URL passed from DashboardActivity
+        // Video urlsini dashboard dan al
         String videoUrl = getIntent().getStringExtra("VIDEO_URL");
 
-        // Set up the WebView to show the YouTube video
+        // Vebwiew ile youtube videosunu oynatma
         if (videoUrl != null) {
             String videoId = videoUrl.substring(videoUrl.indexOf("v=") + 2, videoUrl.indexOf("v=") + 13);
             String embedUrl = "https://www.youtube.com/embed/" + videoId;
@@ -35,8 +35,8 @@ public class VideoActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         Intent intent = new Intent(VideoActivity.this, DashboardActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);  // Avoid restarting DashboardActivity
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP); 
         startActivity(intent);
-        finish();  // Close VideoActivity
+        finish();  // VideoActivity kapat
     }
 }

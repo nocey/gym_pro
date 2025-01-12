@@ -31,8 +31,8 @@ public class ProgramAdapter extends RecyclerView.Adapter<ProgramAdapter.ProgramV
         Question question = questionList.get(position);
         holder.questionText.setText(question.getQuestionText());
 
-        // Set up answers in the RadioGroup
-        Answer[] answers = question.getAnswers();  // Assuming this method provides all answers for a question
+        // Cevaplar için RadioGroup oluştur
+        Answer[] answers = question.getAnswers();  // Sorular için tüm cevapları çeker
         holder.radioGroup.removeAllViews();
         for (int i = 0; i < answers.length; i++) {
             Answer answer = answers[i];

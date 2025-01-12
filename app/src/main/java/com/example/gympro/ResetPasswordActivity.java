@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast; //Widget imper
+import android.widget.Toast; 
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -37,7 +37,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
             return;
         }
 
-        // Send password reset email
+        // Şifre sıfırlama maili gönder
         mAuth.sendPasswordResetEmail(email)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {

@@ -36,31 +36,30 @@ public class DashboardActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
 
-        // Initialize FirebaseAuth and Firestore
+        // firebase tanımlamaları
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
-        // Set up the Toolbar
+        //  Toolbar tanımla
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // Find views
+        // Günleri gösteren RecyclerView tanımla
         dayRecyclerView = findViewById(R.id.dayRecyclerView);
 
-        // Set up RecyclerView for the days of the week using DayAdapter
+        // Programı gösteren TextView tanımla
         dayRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         DayAdapter adapter = new DayAdapter(Arrays.asList("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"), this, this::fetchProgramForDay);
         dayRecyclerView.setAdapter(adapter);
     }
 
-    // Inflate the menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.dashboard_menu, menu);
         return true;
     }
 
-    // Handle menu item clicks
+    // Menüdeki eşleşen öğeleri işle
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -81,7 +80,7 @@ public class DashboardActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    // Fetch program for the selected day (restored to the original logic)
+    // Seçilen güne göre programı çek
     public void fetchProgramForDay(String day) {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
@@ -114,94 +113,94 @@ public class DashboardActivity extends AppCompatActivity {
                                                     Map<String, Object> dayProgram = selectedProgram.get(dayIndex);
                                                     List<Map<String, String>> exercises = (List<Map<String, String>>) dayProgram.get("workouts");
 
-                                                    // Clear WebView (not used here)
+                                                    // Vebviewi temizle
                                                     WebView youtubeWebView = findViewById(R.id.youtubeWebView);
                                                     youtubeWebView.setVisibility(View.GONE);
 
                                                     if (exercises != null && !exercises.isEmpty()) {
-                                                        // Show workout program
+                                                        // Çalışma programını göster
                                                         for (Map<String, String> exercise : exercises) {
                                                             String name = exercise.get("name");
                                                             String sets = exercise.get("sets");
                                                             String link = exercise.get("link");
 
-                                                            // Create a TextView for each exercise name and sets
+                                                            // Textview komponenti oluştur
                                                             TextView exerciseText = new TextView(DashboardActivity.this);
                                                             exerciseText.setText(name + " (" + sets + " sets)");
 
-                                                            // Set background and text color
+                                                            // Arka plan ve yazı rengini ayarla
                                                             exerciseText.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
                                                             exerciseText.setTextColor(getResources().getColor(R.color.colorSecondary));
 
-                                                            // Center the text
+                                                            // Yazıyı ortala
                                                             exerciseText.setGravity(Gravity.CENTER);
 
-                                                            // Increase the text size and make them a bit bigger
-                                                            exerciseText.setTextSize(20); // Adjust size as needed
+                                                            // Yazı boyutunu ayarla
+                                                            exerciseText.setTextSize(20);
 
-                                                            // Add margin to center better vertically
+                                                            // ortaya margin ekler
                                                             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                                                                     LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                                                            params.setMargins(0, 20, 0, 20); // Margin top and bottom to separate from other elements
+                                                            params.setMargins(0, 20, 0, 20); // margin ekle (üst, sol, alt, sağ)
                                                             exerciseText.setLayoutParams(params);
 
                                                             programLayout.addView(exerciseText);
 
-                                                            // If the exercise has a link, add a button to watch the video
+                                                            // Egzersizin video linki var ise tıklama eventi ekle
                                                             if (link != null && !link.isEmpty()) {
                                                                 TextView watchVideoButton = new TextView(DashboardActivity.this);
                                                                 watchVideoButton.setText("Watch Video");
 
-                                                                // Set background and text color for the watch button
+                                                                // Arka plan rengini colorSecondary yap
                                                                 watchVideoButton.setBackgroundColor(getResources().getColor(R.color.colorSecondary)); // Secondary color for background
                                                                 watchVideoButton.setTextColor(getResources().getColor(R.color.colorPrimary)); // Primary color for text
 
-                                                                // Center the text for the watch button
+                                                                // Yazıyı ortala
                                                                 watchVideoButton.setGravity(Gravity.CENTER);
 
-                                                                // Increase the text size for the "Watch Video" button (make it bigger than the other text)
+                                                                // Yazı boyutunu ayarla
                                                                 watchVideoButton.setTextSize(24); // Adjust size to make it bigger than exercise text
 
-                                                                // Add padding for spacing
+                                                                // Padding ekle
                                                                 watchVideoButton.setPadding(0, 10, 0, 10);
 
-                                                                // Set the click listener to open the video
+                                                                // Tıklama eventi ekler
                                                                 watchVideoButton.setOnClickListener(v -> {
-                                                                    // Open the video in a new activity
+                                                                    // Yeni bir aktivite içinde videoyu oynat
                                                                     Intent intent = new Intent(DashboardActivity.this, VideoActivity.class);
-                                                                    intent.putExtra("VIDEO_URL", link);  // Pass the video URL
+                                                                    intent.putExtra("VIDEO_URL", link);  // Video linkini gönder
                                                                     startActivity(intent);
                                                                 });
 
-                                                                // Add the "Watch Video" button below the exercise text
+                                                                // Egzersiz yazısının altına "Video İzle" butonunu ekle
                                                                 programLayout.addView(watchVideoButton);
                                                             }
                                                         }
                                                     }
 
                                                 } else {
-                                                    // Show "Rest day" message
+                                                    // Dinlenme günü
                                                     TextView restDayText = new TextView(DashboardActivity.this);
-                                                    // Set background color to colorPrimary and text color to colorSecondary
+                                                    //  Arka plan rengini colorPrimary yap
                                                     restDayText.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
                                                     restDayText.setTextColor(getResources().getColor(R.color.colorSecondary));
 
                                                     restDayText.setGravity(Gravity.CENTER);
 
-                                                    restDayText.setTextSize(20); // You can adjust the value to make it as big as needed
+                                                    restDayText.setTextSize(20); // Yazı boyutunu ayarla
                                                     restDayText.setText("Rest day");
                                                     programLayout.addView(restDayText);
                                                 }
                                             } else {
-                                                // Day not chosen, show "Rest day" message
+                                                // Dinlenme günü
                                                 TextView restDayText = new TextView(DashboardActivity.this);
-                                                // Set background color to colorPrimary and text color to colorSecondary
+                                                //  Arka plan rengini colorPrimary yap
                                                 restDayText.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
                                                 restDayText.setTextColor(getResources().getColor(R.color.colorSecondary));
 
                                                 restDayText.setGravity(Gravity.CENTER);
 
-                                                restDayText.setTextSize(20); // You can adjust the value to make it as big as needed
+                                                restDayText.setTextSize(20); // Yazı boyutunu ayarla
                                                 restDayText.setText("Rest day");
                                                 programLayout.addView(restDayText);
                                             }
@@ -235,7 +234,7 @@ public class DashboardActivity extends AppCompatActivity {
             case 5:
                 return "five_day";
             default:
-                return "seven_day"; // Default
+                return "seven_day";
         }
     }
 }

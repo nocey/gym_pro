@@ -10,7 +10,7 @@ public class Answer {
         this.answerText = answerText;
         this.strength = strength;
         this.cardio = cardio;
-        this.dayNumber = dayNumber;  // Initialize day number
+        this.dayNumber = dayNumber;  //  Gün sayısını tanımlar
     }
 
     public String getAnswerText() {
@@ -26,6 +26,6 @@ public class Answer {
     }
 
     public int getDayNumber() {
-        return dayNumber;  // Getter for day number
+        return dayNumber;  // Gün sayısını döndürür
     }
 }

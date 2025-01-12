@@ -7,14 +7,14 @@ public class Question {
 
     public Question(String questionText, Answer[] answers) {
         this.questionText = questionText;
-        this.answers = answers;  // Initialize answers
+        this.answers = answers;  // answers tanımlar
     }
 
     public String getQuestionText() {
         return questionText;
     }
 
-    public Answer[] getAnswers() {  // Add this method to return all answers for the question
+    public Answer[] getAnswers() {  // Tüm sorular için cevapları döndürür.
         return answers;
     }
 
